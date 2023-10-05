@@ -1,28 +1,22 @@
 package gui.medicalRecepcionist;
 
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import java.awt.GridLayout;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
-import javax.swing.JLabel;
-import java.awt.CardLayout;
 import java.awt.Font;
-import javax.swing.JTextField;
-import javax.swing.border.TitledBorder;
-import javax.swing.JRadioButton;
-import javax.swing.SwingConstants;
-import javax.swing.JTextArea;
-import javax.swing.JScrollBar;
+import java.awt.GridLayout;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.ListSelectionModel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 
 public class MedicalRecepcionistView extends JFrame {
 
@@ -37,15 +31,15 @@ public class MedicalRecepcionistView extends JFrame {
 	private JPanel panel_4;
 	private JPanel panel_buttons;
 	private JButton btnFinish;
-	private JPanel panel;
+	private JPanel panel_doctor_name;
 	private JLabel lblTypeDoctor;
 	private JTextField textField;
 	private JRadioButton rdbtnUrgent;
-	private JPanel panel_2;
+	private JPanel panel_patient_id;
 	private JLabel lblID_patient;
-	private JTextField textField_1;
-	private JScrollPane scrollPane;
-	private JList list;
+	private JTextField textField_id;
+	private JScrollPane scrollPane_patients;
+	private JList list_patients;
 
 	/**
 	 * Launch the application.
@@ -119,8 +113,8 @@ public class MedicalRecepcionistView extends JFrame {
 			panel_patient = new JPanel();
 			panel_patient.setBorder(new TitledBorder(null, "Patient Information", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 			panel_patient.setLayout(new BorderLayout(0, 0));
-			panel_patient.add(getPanel_2(), BorderLayout.NORTH);
-			panel_patient.add(getScrollPane(), BorderLayout.CENTER);
+			panel_patient.add(getPanel_patient_id(), BorderLayout.NORTH);
+			panel_patient.add(getScrollPane_patients(), BorderLayout.CENTER);
 		}
 		return panel_patient;
 	}
@@ -152,13 +146,13 @@ public class MedicalRecepcionistView extends JFrame {
 		return btnFinish;
 	}
 	private JPanel getPanel_5() {
-		if (panel == null) {
-			panel = new JPanel();
-			panel.setLayout(new GridLayout(0, 2, 0, 0));
-			panel.add(getLblTypeDoctor());
-			panel.add(getTextField());
+		if (panel_doctor_name == null) {
+			panel_doctor_name = new JPanel();
+			panel_doctor_name.setLayout(new GridLayout(0, 2, 0, 0));
+			panel_doctor_name.add(getLblTypeDoctor());
+			panel_doctor_name.add(getTextField());
 		}
-		return panel;
+		return panel_doctor_name;
 	}
 	private JLabel getLblTypeDoctor() {
 		if (lblTypeDoctor == null) {
@@ -180,14 +174,14 @@ public class MedicalRecepcionistView extends JFrame {
 		}
 		return rdbtnUrgent;
 	}
-	private JPanel getPanel_2() {
-		if (panel_2 == null) {
-			panel_2 = new JPanel();
-			panel_2.setLayout(new GridLayout(1, 2, 0, 0));
-			panel_2.add(getLblID_patient());
-			panel_2.add(getTextField_1());
+	private JPanel getPanel_patient_id() {
+		if (panel_patient_id == null) {
+			panel_patient_id = new JPanel();
+			panel_patient_id.setLayout(new GridLayout(1, 2, 0, 0));
+			panel_patient_id.add(getLblID_patient());
+			panel_patient_id.add(getTextField_id());
 		}
-		return panel_2;
+		return panel_patient_id;
 	}
 	private JLabel getLblID_patient() {
 		if (lblID_patient == null) {
@@ -195,25 +189,25 @@ public class MedicalRecepcionistView extends JFrame {
 		}
 		return lblID_patient;
 	}
-	private JTextField getTextField_1() {
-		if (textField_1 == null) {
-			textField_1 = new JTextField();
-			textField_1.setColumns(10);
+	private JTextField getTextField_id() {
+		if (textField_id == null) {
+			textField_id = new JTextField();
+			textField_id.setColumns(10);
 		}
-		return textField_1;
+		return textField_id;
 	}
-	private JScrollPane getScrollPane() {
-		if (scrollPane == null) {
-			scrollPane = new JScrollPane();
-			scrollPane.setViewportView(getList());
+	private JScrollPane getScrollPane_patients() {
+		if (scrollPane_patients == null) {
+			scrollPane_patients = new JScrollPane();
+			scrollPane_patients.setViewportView(getList_patients());
 		}
-		return scrollPane;
+		return scrollPane_patients;
 	}
-	private JList getList() {
-		if (list == null) {
-			list = new JList();
-			list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	private JList getList_patients() {
+		if (list_patients == null) {
+			list_patients = new JList();
+			list_patients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		}
-		return list;
+		return list_patients;
 	}
 }
