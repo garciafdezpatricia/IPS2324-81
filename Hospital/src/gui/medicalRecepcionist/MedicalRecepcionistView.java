@@ -23,25 +23,21 @@ public class MedicalRecepcionistView extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JPanel panel_title;
-	private JPanel panel_1;
+	private JPanel panelGeneral;
 	private JLabel lblTitle;
 	private JPanel panel_doctor;
 	private JPanel panel_patient;
-	private JPanel panel_3;
+	private JPanel panel_office;
 	private JPanel panel_information;
 	private JPanel panel_buttons;
 	private JButton btnFinish;
 	private JPanel panel_doctor_filter;
-	private JLabel lblTypeDoctor;
-	private JTextField textFieldName;
 	private JRadioButton rdbtnUrgent;
 	private JPanel panel_patient_filter;
 	private JLabel lblIPatientNam;
 	private JTextField textFieldNamePatient;
 	private JScrollPane scrollPane_patients;
 	private JList list_patients;
-	private JLabel lblRegistrationNumber;
-	private JTextField textFieldRegistrationNumber;
 	private JScrollPane scrollPaneDoctor;
 	private JList listDoctor;
 	private JLabel lblSSNumber;
@@ -67,13 +63,18 @@ public class MedicalRecepcionistView extends JFrame {
 	public static final String url = "jdbc:oracle:thin:@";
 	public static final String usuario = "Admin";
 	public static final String contraseña = "LyQmZ7HwG4edJ2";
+	private JPanel panelNameAndNumber;
+	private JLabel lblTypeDoctor;
+	private JTextField textField_3;
+	private JLabel lblRegistrationNumber;
+	private JTextField textField_4;
 	private JPanel panelDate;
-	private JLabel lblFrom;
-	private JTextField textFieldFrom;
-	private JLabel lblTo;
-	private JTextField textFieldTo;
 	private JLabel lblDay;
-	private JTextField txtDay;
+	private JTextField textField;
+	private JLabel lblFrom;
+	private JTextField textField_1;
+	private JLabel lblTo;
+	private JTextField textField_2;
 
 	/**
 	 * Create the frame.
@@ -87,7 +88,7 @@ public class MedicalRecepcionistView extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
 		contentPane.add(getPanel_title(), BorderLayout.NORTH);
-		contentPane.add(getPanel_1(), BorderLayout.CENTER);
+		contentPane.add(getPanelGeneral(), BorderLayout.CENTER);
 		contentPane.add(getPanel_buttons(), BorderLayout.SOUTH);
 	}
 	private JPanel getPanel_title() {
@@ -97,16 +98,16 @@ public class MedicalRecepcionistView extends JFrame {
 		}
 		return panel_title;
 	}
-	private JPanel getPanel_1() {
-		if (panel_1 == null) {
-			panel_1 = new JPanel();
-			panel_1.setLayout(new GridLayout(2, 2, 0, 0));
-			panel_1.add(getPanel_doctor());
-			panel_1.add(getPanel_patient());
-			panel_1.add(getPanel_3());
-			panel_1.add(getPanel_information());
+	private JPanel getPanelGeneral() {
+		if (panelGeneral == null) {
+			panelGeneral = new JPanel();
+			panelGeneral.setLayout(new GridLayout(2, 2, 0, 0));
+			panelGeneral.add(getPanel_doctor());
+			panelGeneral.add(getPanel_patient());
+			panelGeneral.add(getPanel_office());
+			panelGeneral.add(getPanel_information());
 		}
-		return panel_1;
+		return panelGeneral;
 	}
 	private JLabel getLblTitle() {
 		if (lblTitle == null) {
@@ -136,18 +137,17 @@ public class MedicalRecepcionistView extends JFrame {
 		}
 		return panel_patient;
 	}
-	private JPanel getPanel_3() {
-		if (panel_3 == null) {
-			panel_3 = new JPanel();
+	private JPanel getPanel_office() {
+		if (panel_office == null) {
+			panel_office = new JPanel();
 		}
-		return panel_3;
+		return panel_office;
 	}
 	private JPanel getPanel_information() {
 		if (panel_information == null) {
 			panel_information = new JPanel();
 			panel_information.setBorder(new TitledBorder(null, "Information", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 			panel_information.setLayout(new BorderLayout(0, 0));
-			panel_information.add(getPanelDate(), BorderLayout.NORTH);
 		}
 		return panel_information;
 	}
@@ -169,27 +169,11 @@ public class MedicalRecepcionistView extends JFrame {
 	private JPanel getPanel_5() {
 		if (panel_doctor_filter == null) {
 			panel_doctor_filter = new JPanel();
-			panel_doctor_filter.setLayout(new GridLayout(0, 2, 0, 0));
-			panel_doctor_filter.add(getLblTypeDoctor());
-			panel_doctor_filter.add(getTextFieldName());
-			panel_doctor_filter.add(getLblRegistrationNumber());
-			panel_doctor_filter.add(getTextFieldRegistrationNumber());
+			panel_doctor_filter.setLayout(new BorderLayout(0, 0));
+			panel_doctor_filter.add(getPanelNameAndNumber());
+			panel_doctor_filter.add(getPanelDate(), BorderLayout.NORTH);
 		}
 		return panel_doctor_filter;
-	}
-	private JLabel getLblTypeDoctor() {
-		if (lblTypeDoctor == null) {
-			lblTypeDoctor = new JLabel("Filter by name:");
-			lblTypeDoctor.setFont(new Font("Tahoma", Font.BOLD, 11));
-		}
-		return lblTypeDoctor;
-	}
-	private JTextField getTextFieldName() {
-		if (textFieldName == null) {
-			textFieldName = new JTextField();
-			textFieldName.setColumns(10);
-		}
-		return textFieldName;
 	}
 	private JRadioButton getRdbtnUrgent() {
 		if (rdbtnUrgent == null) {
@@ -236,20 +220,6 @@ public class MedicalRecepcionistView extends JFrame {
 		}
 		return list_patients;
 	}
-	private JLabel getLblRegistrationNumber() {
-		if (lblRegistrationNumber == null) {
-			lblRegistrationNumber = new JLabel("Filter by doctor's registration number:");
-			lblRegistrationNumber.setFont(new Font("Tahoma", Font.BOLD, 11));
-		}
-		return lblRegistrationNumber;
-	}
-	private JTextField getTextFieldRegistrationNumber() {
-		if (textFieldRegistrationNumber == null) {
-			textFieldRegistrationNumber = new JTextField();
-			textFieldRegistrationNumber.setColumns(10);
-		}
-		return textFieldRegistrationNumber;
-	}
 	private JScrollPane getScrollPaneDoctor() {
 		if (scrollPaneDoctor == null) {
 			scrollPaneDoctor = new JScrollPane();
@@ -277,49 +247,59 @@ public class MedicalRecepcionistView extends JFrame {
 		}
 		return textFieldSSNumber;
 	}
+	private JPanel getPanelNameAndNumber() {
+		if (panelNameAndNumber == null) {
+			panelNameAndNumber = new JPanel();
+			panelNameAndNumber.setBorder(new TitledBorder(null, "Filters", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+			panelNameAndNumber.setLayout(new GridLayout(0, 2, 0, 0));
+			panelNameAndNumber.add(getLblTypeDoctor_1());
+			panelNameAndNumber.add(getTextField_3());
+			panelNameAndNumber.add(getLblRegistrationNumber_1());
+			panelNameAndNumber.add(getTextField_4());
+		}
+		return panelNameAndNumber;
+	}
+	private JLabel getLblTypeDoctor_1() {
+		if (lblTypeDoctor == null) {
+			lblTypeDoctor = new JLabel("Filter by name:");
+			lblTypeDoctor.setFont(new Font("Tahoma", Font.BOLD, 11));
+		}
+		return lblTypeDoctor;
+	}
+	private JTextField getTextField_3() {
+		if (textField_3 == null) {
+			textField_3 = new JTextField();
+			textField_3.setColumns(10);
+		}
+		return textField_3;
+	}
+	private JLabel getLblRegistrationNumber_1() {
+		if (lblRegistrationNumber == null) {
+			lblRegistrationNumber = new JLabel("Filter by doctor's registration number:");
+			lblRegistrationNumber.setFont(new Font("Tahoma", Font.BOLD, 11));
+		}
+		return lblRegistrationNumber;
+	}
+	private JTextField getTextField_4() {
+		if (textField_4 == null) {
+			textField_4 = new JTextField();
+			textField_4.setColumns(10);
+		}
+		return textField_4;
+	}
 	private JPanel getPanelDate() {
 		if (panelDate == null) {
 			panelDate = new JPanel();
 			panelDate.setBorder(new TitledBorder(null, "Day and hour", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 			panelDate.setLayout(new GridLayout(0, 6, 0, 0));
 			panelDate.add(getLblDay());
-			panelDate.add(getTxtDay());
+			panelDate.add(getTextField());
 			panelDate.add(getLblFrom());
-			panelDate.add(getTextFieldFrom());
+			panelDate.add(getTextField_1());
 			panelDate.add(getLblTo());
-			panelDate.add(getTextFieldTo());
+			panelDate.add(getTextField_2());
 		}
 		return panelDate;
-	}
-	private JLabel getLblFrom() {
-		if (lblFrom == null) {
-			lblFrom = new JLabel("From:");
-			lblFrom.setFont(new Font("Tahoma", Font.BOLD, 10));
-		}
-		return lblFrom;
-	}
-	private JTextField getTextFieldFrom() {
-		if (textFieldFrom == null) {
-			textFieldFrom = new JTextField();
-			textFieldFrom.setText("hh:mm");
-			textFieldFrom.setColumns(10);
-		}
-		return textFieldFrom;
-	}
-	private JLabel getLblTo() {
-		if (lblTo == null) {
-			lblTo = new JLabel("To:");
-			lblTo.setFont(new Font("Tahoma", Font.BOLD, 10));
-		}
-		return lblTo;
-	}
-	private JTextField getTextFieldTo() {
-		if (textFieldTo == null) {
-			textFieldTo = new JTextField();
-			textFieldTo.setText("hh:mm");
-			textFieldTo.setColumns(10);
-		}
-		return textFieldTo;
 	}
 	private JLabel getLblDay() {
 		if (lblDay == null) {
@@ -328,12 +308,42 @@ public class MedicalRecepcionistView extends JFrame {
 		}
 		return lblDay;
 	}
-	private JTextField getTxtDay() {
-		if (txtDay == null) {
-			txtDay = new JTextField();
-			txtDay.setText("mm/dd/yy");
-			txtDay.setColumns(10);
+	private JTextField getTextField() {
+		if (textField == null) {
+			textField = new JTextField();
+			textField.setText("mm/dd/yy");
+			textField.setColumns(10);
 		}
-		return txtDay;
+		return textField;
+	}
+	private JLabel getLblFrom() {
+		if (lblFrom == null) {
+			lblFrom = new JLabel("From:");
+			lblFrom.setFont(new Font("Tahoma", Font.BOLD, 10));
+		}
+		return lblFrom;
+	}
+	private JTextField getTextField_1() {
+		if (textField_1 == null) {
+			textField_1 = new JTextField();
+			textField_1.setText("hh:mm");
+			textField_1.setColumns(10);
+		}
+		return textField_1;
+	}
+	private JLabel getLblTo() {
+		if (lblTo == null) {
+			lblTo = new JLabel("To:");
+			lblTo.setFont(new Font("Tahoma", Font.BOLD, 10));
+		}
+		return lblTo;
+	}
+	private JTextField getTextField_2() {
+		if (textField_2 == null) {
+			textField_2 = new JTextField();
+			textField_2.setText("hh:mm");
+			textField_2.setColumns(10);
+		}
+		return textField_2;
 	}
 }
