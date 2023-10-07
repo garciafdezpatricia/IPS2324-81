@@ -67,6 +67,13 @@ public class MedicalRecepcionistView extends JFrame {
 	public static final String url = "jdbc:oracle:thin:@";
 	public static final String usuario = "Admin";
 	public static final String contraseña = "LyQmZ7HwG4edJ2";
+	private JPanel panelDate;
+	private JLabel lblFrom;
+	private JTextField textFieldFrom;
+	private JLabel lblTo;
+	private JTextField textFieldTo;
+	private JLabel lblDay;
+	private JTextField txtDay;
 
 	/**
 	 * Create the frame.
@@ -140,6 +147,7 @@ public class MedicalRecepcionistView extends JFrame {
 			panel_information = new JPanel();
 			panel_information.setBorder(new TitledBorder(null, "Information", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 			panel_information.setLayout(new BorderLayout(0, 0));
+			panel_information.add(getPanelDate(), BorderLayout.NORTH);
 		}
 		return panel_information;
 	}
@@ -172,7 +180,7 @@ public class MedicalRecepcionistView extends JFrame {
 	private JLabel getLblTypeDoctor() {
 		if (lblTypeDoctor == null) {
 			lblTypeDoctor = new JLabel("Filter by name:");
-			lblTypeDoctor.setFont(new Font("Tahoma", Font.BOLD, 12));
+			lblTypeDoctor.setFont(new Font("Tahoma", Font.BOLD, 11));
 		}
 		return lblTypeDoctor;
 	}
@@ -230,7 +238,7 @@ public class MedicalRecepcionistView extends JFrame {
 	}
 	private JLabel getLblRegistrationNumber() {
 		if (lblRegistrationNumber == null) {
-			lblRegistrationNumber = new JLabel("Filter by doctor's registration number");
+			lblRegistrationNumber = new JLabel("Filter by doctor's registration number:");
 			lblRegistrationNumber.setFont(new Font("Tahoma", Font.BOLD, 11));
 		}
 		return lblRegistrationNumber;
@@ -257,7 +265,7 @@ public class MedicalRecepcionistView extends JFrame {
 	}
 	private JLabel getLblSSNumber() {
 		if (lblSSNumber == null) {
-			lblSSNumber = new JLabel("Filter by social security number");
+			lblSSNumber = new JLabel("Filter by social security number:");
 			lblSSNumber.setFont(new Font("Tahoma", Font.BOLD, 11));
 		}
 		return lblSSNumber;
@@ -268,5 +276,64 @@ public class MedicalRecepcionistView extends JFrame {
 			textFieldSSNumber.setColumns(10);
 		}
 		return textFieldSSNumber;
+	}
+	private JPanel getPanelDate() {
+		if (panelDate == null) {
+			panelDate = new JPanel();
+			panelDate.setBorder(new TitledBorder(null, "Day and hour", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+			panelDate.setLayout(new GridLayout(0, 6, 0, 0));
+			panelDate.add(getLblDay());
+			panelDate.add(getTxtDay());
+			panelDate.add(getLblFrom());
+			panelDate.add(getTextFieldFrom());
+			panelDate.add(getLblTo());
+			panelDate.add(getTextFieldTo());
+		}
+		return panelDate;
+	}
+	private JLabel getLblFrom() {
+		if (lblFrom == null) {
+			lblFrom = new JLabel("From:");
+			lblFrom.setFont(new Font("Tahoma", Font.BOLD, 10));
+		}
+		return lblFrom;
+	}
+	private JTextField getTextFieldFrom() {
+		if (textFieldFrom == null) {
+			textFieldFrom = new JTextField();
+			textFieldFrom.setText("hh:mm");
+			textFieldFrom.setColumns(10);
+		}
+		return textFieldFrom;
+	}
+	private JLabel getLblTo() {
+		if (lblTo == null) {
+			lblTo = new JLabel("To:");
+			lblTo.setFont(new Font("Tahoma", Font.BOLD, 10));
+		}
+		return lblTo;
+	}
+	private JTextField getTextFieldTo() {
+		if (textFieldTo == null) {
+			textFieldTo = new JTextField();
+			textFieldTo.setText("hh:mm");
+			textFieldTo.setColumns(10);
+		}
+		return textFieldTo;
+	}
+	private JLabel getLblDay() {
+		if (lblDay == null) {
+			lblDay = new JLabel("Day:");
+			lblDay.setFont(new Font("Tahoma", Font.BOLD, 10));
+		}
+		return lblDay;
+	}
+	private JTextField getTxtDay() {
+		if (txtDay == null) {
+			txtDay = new JTextField();
+			txtDay.setText("mm/dd/yy");
+			txtDay.setColumns(10);
+		}
+		return txtDay;
 	}
 }
