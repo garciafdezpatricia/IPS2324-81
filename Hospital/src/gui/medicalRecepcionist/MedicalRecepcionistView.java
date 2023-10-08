@@ -7,18 +7,21 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.System.Logger.Level;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Properties;
+import java.util.*;
 
 import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -31,6 +34,9 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+
+import db.Doctor;
+import util.ConnectionFactory;
 
 public class MedicalRecepcionistView extends JFrame {
 
@@ -46,7 +52,6 @@ public class MedicalRecepcionistView extends JFrame {
 	private JPanel panel_buttons;
 	private JButton btnFinish;
 	private JPanel panel_doctor_filter;
-	private JRadioButton rdbtnUrgent;
 	private JPanel panel_patient_filter;
 	private JLabel lblIPatientNam;
 	private JTextField textFieldNamePatient;
@@ -56,6 +61,10 @@ public class MedicalRecepcionistView extends JFrame {
 	private JList listDoctor;
 	private JLabel lblSSNumber;
 	private JTextField textFieldSSNumber;
+	private DefaultListModel<Doctor> doctors = new DefaultListModel<>();
+	private DefaultListModel<Doctor> doctorsReset = new DefaultListModel<>();
+
+
 
 	/**
 	 * Launch the application.
@@ -67,6 +76,7 @@ public class MedicalRecepcionistView extends JFrame {
 					MedicalRecepcionistView frame = new MedicalRecepcionistView();
 					frame.setVisible(true);
 					frame.setLocationRelativeTo(null); // centrar pantalla
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -79,9 +89,9 @@ public class MedicalRecepcionistView extends JFrame {
 	public static final String contraseña = "LyQmZ7HwG4edJ2";
 	private JPanel panelNameAndNumber;
 	private JLabel lblTypeDoctor;
-	private JTextField textField_3;
+	private JTextField textNameDoctor;
 	private JLabel lblRegistrationNumber;
-	private JTextField textField_4;
+	private JTextField textRegNumber;
 	private JPanel panelDate;
 	private JLabel lblDay;
 	private JTextField textField;
@@ -89,21 +99,66 @@ public class MedicalRecepcionistView extends JFrame {
 	private JTextField textField_1;
 	private JLabel lblTo;
 	private JTextField textField_2;
+	private JButton btnFilterName;
+	private JButton btnRegNumber;
+	private JPanel panel;
+	private JRadioButton rdbtnUrgent;
+	private JButton btnReset;
 
 	/**
 	 * Create the frame.
 	 */
 	public MedicalRecepcionistView() {
+		try {
+			// Establecer la conexión
+			Connection connection = ConnectionFactory.getOracleConnection();
+
+			// Crear una sentencia SQL
+			Statement statement = connection.createStatement();
+
+			// Ejecutar una consulta SQL
+			String sql = "SELECT * FROM DOCTOR";
+			ResultSet resultSet = statement.executeQuery(sql);
+
+			// Procesar los resultados
+			while (resultSet.next()) {
+				int id = resultSet.getInt("id");
+				String numcolegiado = resultSet.getString("numcolegiado");
+				String name = resultSet.getString("name");
+				String surname = resultSet.getString("surname");
+				String email = resultSet.getString("email");
+				// Procesa otros campos según la estructura de tu tabla
+				System.out.println("ID: " + id + ", Numero Colegiado: " + numcolegiado);
+				doctors.addElement(new Doctor(id, numcolegiado, name, surname, email));
+				doctorsReset.addElement(new Doctor(id, numcolegiado, name, surname, email));
+
+			}
+
+			// Cerrar la conexión
+			resultSet.close();
+			statement.close();
+			connection.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 906, 553);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
 		contentPane.add(getPanel_title(), BorderLayout.NORTH);
 		contentPane.add(getPanelGeneral(), BorderLayout.CENTER);
 		contentPane.add(getPanel_buttons(), BorderLayout.SOUTH);
+
+
+		listDoctor = new JList<>(doctors); // Asegúrate de especificar el tipo de elemento en la JList
+		scrollPaneDoctor = new JScrollPane(listDoctor);
+
+		// Agregar el JScrollPane con la JList al contenido del JFrame
+		panel_doctor.add(scrollPaneDoctor, BorderLayout.CENTER); // Puedes ajustar la ubicación según tus necesidades
+
 	}
 
 	private JPanel getPanel_title() {
@@ -141,8 +196,8 @@ public class MedicalRecepcionistView extends JFrame {
 					.setBorder(new TitledBorder(null, "Doctor ", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 			panel_doctor.setLayout(new BorderLayout(0, 0));
 			panel_doctor.add(getPanel_5(), BorderLayout.NORTH);
-			panel_doctor.add(getRdbtnUrgent(), BorderLayout.SOUTH);
 			panel_doctor.add(getScrollPaneDoctor(), BorderLayout.CENTER);
+			panel_doctor.add(getPanel(), BorderLayout.SOUTH);
 		}
 		return panel_doctor;
 	}
@@ -196,7 +251,7 @@ public class MedicalRecepcionistView extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					int opcion = JOptionPane.showConfirmDialog(MedicalRecepcionistView.this,
 							"Are you sure you want to reserve the appointment between the doctor(s) "
-									+ "xxxx and the patient xxxx on mm/dd/yy at hh/mm in the office xxxx?",
+									+ listDoctor.getSelectedValuesList() + " and the patient xxxx on mm/dd/yy at hh/mm in the office xxxx?",
 							"Confirmation", JOptionPane.YES_NO_OPTION);
 
 					// Verificar la respuesta del usuario
@@ -206,7 +261,9 @@ public class MedicalRecepcionistView extends JFrame {
 						System.out.println("Acción realizada.");
 						// TODO: se envia un correo
 						if (rdbtnUrgent.isSelected()) {
-							sendEmail();
+							for(int i = 0; i < listDoctor.getSelectedValuesList().size(); i++) {
+								sendEmail(((Doctor)listDoctor.getSelectedValuesList().get(i)).getEmail());
+							}
 						}
 					} else {
 						// El usuario ha cancelado la acción
@@ -219,40 +276,40 @@ public class MedicalRecepcionistView extends JFrame {
 		return btnFinish;
 	}
 
+	//TODO: poner más datos
+	private void sendEmail(String destinatario) {
+//		String destinatario = "lauratbg2001@gmail.com";
+		String asunto = "Urgent appointment";
+		String mensaje = "You have a new urgent appointment with the patient xxxx";
 
-	private void sendEmail() {
-		String destinatario = "lauratbg2001@gmail.com";
-        String asunto = "Urgent appointment";
-        String mensaje = "You have a new urgent appointment!";
+		// Configurar propiedades para la conexión SMTP
+		Properties propiedades = new Properties();
+		propiedades.put("mail.smtp.host", "smtp.gmail.com");
+		propiedades.put("mail.smtp.port", "587");
+		propiedades.put("mail.smtp.auth", "true");
+		propiedades.put("mail.smtp.starttls.enable", "true");
 
-        // Configurar propiedades para la conexión SMTP
-        Properties propiedades = new Properties();
-        propiedades.put("mail.smtp.host", "smtp.gmail.com");
-        propiedades.put("mail.smtp.port", "587");
-        propiedades.put("mail.smtp.auth", "true");
-        propiedades.put("mail.smtp.starttls.enable", "true");
+		// Crear una sesión de correo electrónico
+		Session sesion = Session.getInstance(propiedades, new Authenticator() {
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication("ips232481@gmail.com", "tojp oyjw kamn xxmy");
+			}
+		});
 
-        // Crear una sesión de correo electrónico
-        Session sesion = Session.getInstance(propiedades, new Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("ips232481@gmail.com", "tojp oyjw kamn xxmy");
-            }
-        });
+		try {
+			// Crear un mensaje de correo electrónico
+			MimeMessage mensajeCorreo = new MimeMessage(sesion);
+			mensajeCorreo.setFrom(new InternetAddress("tu-correo@gmail.com"));
+			mensajeCorreo.addRecipient(Message.RecipientType.TO, new InternetAddress(destinatario));
+			mensajeCorreo.setSubject(asunto);
+			mensajeCorreo.setText(mensaje);
 
-        try {
-            // Crear un mensaje de correo electrónico
-            MimeMessage mensajeCorreo = new MimeMessage(sesion);
-            mensajeCorreo.setFrom(new InternetAddress("tu-correo@gmail.com"));
-            mensajeCorreo.addRecipient(Message.RecipientType.TO, new InternetAddress(destinatario));
-            mensajeCorreo.setSubject(asunto);
-            mensajeCorreo.setText(mensaje);
-
-            // Enviar el correo electrónico
-            Transport.send(mensajeCorreo);
-            System.out.println("Correo enviado con éxito.");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+			// Enviar el correo electrónico
+			Transport.send(mensajeCorreo);
+			System.out.println("Correo enviado con éxito.");
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	private JPanel getPanel_5() {
@@ -263,13 +320,6 @@ public class MedicalRecepcionistView extends JFrame {
 			panel_doctor_filter.add(getPanelDate(), BorderLayout.NORTH);
 		}
 		return panel_doctor_filter;
-	}
-
-	private JRadioButton getRdbtnUrgent() {
-		if (rdbtnUrgent == null) {
-			rdbtnUrgent = new JRadioButton("Urgent");
-		}
-		return rdbtnUrgent;
 	}
 
 	private JPanel getPanel_patient_filter() {
@@ -352,11 +402,13 @@ public class MedicalRecepcionistView extends JFrame {
 			panelNameAndNumber = new JPanel();
 			panelNameAndNumber
 					.setBorder(new TitledBorder(null, "Filters", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-			panelNameAndNumber.setLayout(new GridLayout(0, 2, 0, 0));
+			panelNameAndNumber.setLayout(new GridLayout(0, 3, 0, 0));
 			panelNameAndNumber.add(getLblTypeDoctor_1());
-			panelNameAndNumber.add(getTextField_3());
+			panelNameAndNumber.add(getTextNameDoctor());
+			panelNameAndNumber.add(getBtnFilterName());
 			panelNameAndNumber.add(getLblRegistrationNumber_1());
-			panelNameAndNumber.add(getTextField_4());
+			panelNameAndNumber.add(getTextRegNumber());
+			panelNameAndNumber.add(getBtnRegNumber());
 		}
 		return panelNameAndNumber;
 	}
@@ -369,12 +421,12 @@ public class MedicalRecepcionistView extends JFrame {
 		return lblTypeDoctor;
 	}
 
-	private JTextField getTextField_3() {
-		if (textField_3 == null) {
-			textField_3 = new JTextField();
-			textField_3.setColumns(10);
+	private JTextField getTextNameDoctor() {
+		if (textNameDoctor == null) {
+			textNameDoctor = new JTextField();
+			textNameDoctor.setColumns(10);
 		}
-		return textField_3;
+		return textNameDoctor;
 	}
 
 	private JLabel getLblRegistrationNumber_1() {
@@ -385,12 +437,13 @@ public class MedicalRecepcionistView extends JFrame {
 		return lblRegistrationNumber;
 	}
 
-	private JTextField getTextField_4() {
-		if (textField_4 == null) {
-			textField_4 = new JTextField();
-			textField_4.setColumns(10);
+	private JTextField getTextRegNumber() {
+		if (textRegNumber == null) {
+			textRegNumber = new JTextField();
+			textRegNumber.setColumns(10);
+			
 		}
-		return textField_4;
+		return textRegNumber;
 	}
 
 	private JPanel getPanelDate() {
@@ -458,5 +511,97 @@ public class MedicalRecepcionistView extends JFrame {
 			textField_2.setColumns(10);
 		}
 		return textField_2;
+	}
+	private JButton getBtnFilterName() {
+		if (btnFilterName == null) {
+			btnFilterName = new JButton("Filter");
+			DefaultListModel<Doctor> filteredByName = new DefaultListModel<>();
+			btnFilterName.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					if(!getTextNameDoctor().getText().isBlank() && !getTextNameDoctor().getText().isEmpty()) {
+						for(int i = 0; i < doctors.getSize(); i++) {
+							if(getTextNameDoctor().getText().equals(doctors.get(i).getName())) {
+								filteredByName.addElement(doctors.get(i));
+							}
+						}
+					}
+					
+					List<Doctor>selected = listDoctor.getSelectedValuesList();
+		
+					doctors.removeAllElements();
+					listDoctor.getSelectedValue();
+					for(int i = 0; i < filteredByName.size(); i++) {
+						if(!doctors.contains(filteredByName.get(i))) {
+							doctors.addElement(filteredByName.get(i));
+						}
+					}
+					for(int i = 0; i < selected.size(); i++) {
+						doctors.addElement(selected.get(i));
+					}
+				}
+			});
+		}
+		return btnFilterName;
+	}
+	private JButton getBtnRegNumber() {
+		if (btnRegNumber == null) {
+			btnRegNumber = new JButton("Filter");
+			
+			DefaultListModel<Doctor> filteredByRegNumber = new DefaultListModel<>();
+			btnRegNumber.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					if(!getTextRegNumber().getText().isBlank() && !getTextRegNumber().getText().isEmpty()) {
+						for(int i = 0; i < doctors.getSize(); i++) {
+							if(getTextRegNumber().getText().equals(doctors.get(i).getNumColegiado())) {
+								filteredByRegNumber.addElement(doctors.get(i));
+							}
+						}
+					}
+					
+					List<Doctor>selected = listDoctor.getSelectedValuesList();
+		
+					doctors.removeAllElements();
+					listDoctor.getSelectedValue();
+					for(int i = 0; i < filteredByRegNumber.size(); i++) {
+						if(!doctors.contains(filteredByRegNumber.get(i))) {
+							doctors.addElement(filteredByRegNumber.get(i));
+						}
+					}
+					for(int i = 0; i < selected.size(); i++) {
+						doctors.addElement(selected.get(i));
+					}
+				}
+			});
+		}
+		return btnRegNumber;
+	}
+	private JPanel getPanel() {
+		if (panel == null) {
+			panel = new JPanel();
+			panel.setLayout(new GridLayout(0, 2, 0, 0));
+			panel.add(getRdbtnUrgent());
+			panel.add(getBtnReset());
+		}
+		return panel;
+	}
+	private JRadioButton getRdbtnUrgent() {
+		if (rdbtnUrgent == null) {
+			rdbtnUrgent = new JRadioButton("Urgent");
+		}
+		return rdbtnUrgent;
+	}
+	private JButton getBtnReset() {
+		if (btnReset == null) {
+			btnReset = new JButton("ResetFilters");
+			btnReset.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					doctors.removeAllElements();
+					for(int i = 0; i < doctorsReset.size(); i++) {
+						doctors.addElement(doctorsReset.get(i));
+					}
+				}
+			});
+		}
+		return btnReset;
 	}
 }
