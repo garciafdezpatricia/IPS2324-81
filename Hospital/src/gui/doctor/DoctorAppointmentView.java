@@ -218,8 +218,8 @@ public class DoctorAppointmentView extends JFrame {
                     getBtnCheckInTime().setEnabled(true);
 				}
 			});
-			
-			buttonGroup.add(rdbtnYes);
+			rdbtnYes.setSelected(true);
+			buttonGroup.add(rdbtnYes);;
 			rdbtnYes.setBounds(303, 18, 59, 23);
 		}
 		return rdbtnYes;
