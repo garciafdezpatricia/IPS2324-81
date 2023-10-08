@@ -12,14 +12,24 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.awt.event.ActionEvent;
 import javax.swing.JToggleButton;
 import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
+import javax.swing.ButtonModel;
+import javax.swing.DefaultListModel;
+
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
+import java.awt.Font;
+import javax.swing.JList;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 public class DoctorAppointmentView extends JFrame {
 
@@ -42,7 +52,25 @@ public class DoctorAppointmentView extends JFrame {
 	private JRadioButton rdbtnYes;
 	private JRadioButton rdbtnNo;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
+	private JLabel lblValueButtonGroup;
+	private JList causesList;
+	private JScrollPane scrollPane;
+	private JLabel lblListCauses;
+	private JButton btnAddCause;
+	private JLabel lblCustomCause;
+	private JTextArea txtAreaCustomCause;
+	private JScrollPane scrollPane_1;
+	private JButton btnAddCustomCause;
+	private JList finalCausesList;
+	private JScrollPane scrollPane_2;
+	private JLabel lblSelectedCauses;
+	private JButton btnRemoveCause;
 
+	
+	private List<String> causes = new ArrayList<String>(Arrays.asList("Rodilla rota", "Dolor de cabeza", "Embarazo", 
+			"Revisión médica", "Análisis de sangre", "Vacunación", "Distensión de ligamento anterior cruzado", "Tendinitis"));
+	
+	private DefaultListModel<String> finalCauses = new DefaultListModel<String>();
 	/**
 	 * Launch the application.
 	 */
@@ -64,7 +92,7 @@ public class DoctorAppointmentView extends JFrame {
 	 */
 	public DoctorAppointmentView() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 695, 428);
+		setBounds(100, 100, 695, 571);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
@@ -73,6 +101,8 @@ public class DoctorAppointmentView extends JFrame {
 		contentPane.add(getAppointmentInfoPanel(), BorderLayout.NORTH);
 		contentPane.add(getAppointmentOptionsPanel(), BorderLayout.CENTER);
 		contentPane.add(getButtonsPanel(), BorderLayout.SOUTH);
+		
+		
 	}
 
 	private JPanel getAppointmentInfoPanel() {
@@ -89,6 +119,7 @@ public class DoctorAppointmentView extends JFrame {
 	private JLabel getLblAppointmentPatient() {
 		if (lblAppointmentPatient == null) {
 			lblAppointmentPatient = new JLabel("New label");
+			lblAppointmentPatient.setFont(new Font("Tahoma", Font.PLAIN, 16));
 			lblAppointmentPatient.setText("MARGARITA RAMOS ARIAS");
 		}
 		return lblAppointmentPatient;
@@ -96,6 +127,7 @@ public class DoctorAppointmentView extends JFrame {
 	private JLabel getLblAppointmentDate() {
 		if (lblAppointmentDate == null) {
 			lblAppointmentDate = new JLabel("New label");
+			lblAppointmentDate.setFont(new Font("Tahoma", Font.PLAIN, 14));
 			lblAppointmentDate.setText("12/10/2024 10.15");
 		}
 		return lblAppointmentDate;
@@ -113,6 +145,16 @@ public class DoctorAppointmentView extends JFrame {
 			appointmentOptionsPanel.add(getLblAttendance());
 			appointmentOptionsPanel.add(getRdbtnYes());
 			appointmentOptionsPanel.add(getRdbtnNo());
+			appointmentOptionsPanel.add(getLblValueButtonGroup());
+			appointmentOptionsPanel.add(getScrollPane());
+			appointmentOptionsPanel.add(getLblListCauses());
+			appointmentOptionsPanel.add(getBtnAddCause());
+			appointmentOptionsPanel.add(getLblCustomCause());
+			appointmentOptionsPanel.add(getScrollPane_1());
+			appointmentOptionsPanel.add(getBtnAddCustomCause());
+			appointmentOptionsPanel.add(getScrollPane_2());
+			appointmentOptionsPanel.add(getLblSelectedCauses());
+			appointmentOptionsPanel.add(getBtnRemoveCause());
 		}
 		return appointmentOptionsPanel;
 	}
@@ -134,7 +176,7 @@ public class DoctorAppointmentView extends JFrame {
 	private JLabel getLblCheckOutTime() {
 		if (lblCheckOutTime == null) {
 			lblCheckOutTime = new JLabel("Check-out:");
-			lblCheckOutTime.setBounds(319, 77, 96, 14);
+			lblCheckOutTime.setBounds(327, 77, 96, 14);
 		}
 		return lblCheckOutTime;
 	}
@@ -216,6 +258,8 @@ public class DoctorAppointmentView extends JFrame {
                     getTxtCheckOutTime().setEnabled(true);
                     getBtnCheckOutTime().setEnabled(true);
                     getBtnCheckInTime().setEnabled(true);
+                    String value = rdbtnYes.isSelected() ? "Yes" : "No";
+                    getLblValueButtonGroup().setText(value);
 				}
 			});
 			rdbtnYes.setSelected(true);
@@ -233,6 +277,8 @@ public class DoctorAppointmentView extends JFrame {
                 	getTxtCheckOutTime().setEnabled(false);
                     getBtnCheckOutTime().setEnabled(false);
                     getBtnCheckInTime().setEnabled(false);
+                    String value = rdbtnNo.isSelected() ? "No" : "Yes";
+                    getLblValueButtonGroup().setText(value);
 				}
 			});
 			
@@ -241,5 +287,128 @@ public class DoctorAppointmentView extends JFrame {
 			rdbtnNo.setBounds(372, 18, 59, 23);
 		}
 		return rdbtnNo;
+	}
+	private JLabel getLblValueButtonGroup() {
+		if (lblValueButtonGroup == null) {
+			lblValueButtonGroup = new JLabel("");
+			lblValueButtonGroup.setBounds(479, 21, 77, 14);
+		}
+		return lblValueButtonGroup;
+	}
+	private JList getCausesList() {
+		DefaultListModel<String> model = new DefaultListModel();
+		for (String cause : this.causes) {
+			model.addElement(cause);
+		}
+		if (causesList == null) {
+			causesList = new JList<>(model);
+		}
+		return causesList;
+	}
+	private JScrollPane getScrollPane() {
+		if (scrollPane == null) {
+			scrollPane = new JScrollPane();
+			scrollPane.setBounds(24, 162, 216, 130);
+			scrollPane.setViewportView(getCausesList());
+		}
+		return scrollPane;
+	}
+	private JLabel getLblListCauses() {
+		if (lblListCauses == null) {
+			lblListCauses = new JLabel("Select appointment cause(s):");
+			lblListCauses.setBounds(24, 137, 184, 14);
+		}
+		return lblListCauses;
+	}
+	private JButton getBtnAddCause() {
+		if (btnAddCause == null) {
+			btnAddCause = new JButton(">>");
+			btnAddCause.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					List<String> causesSelected = getCausesList().getSelectedValuesList();
+					for (String cause : causesSelected) {
+						if (!finalCauses.contains(cause)) {
+							finalCauses.addElement(cause);
+						}
+					}
+					getFinalCausesList().setModel(finalCauses);
+				}
+			});
+			btnAddCause.setBounds(263, 172, 77, 23);
+		}
+		return btnAddCause;
+	}
+	private JLabel getLblCustomCause() {
+		if (lblCustomCause == null) {
+			lblCustomCause = new JLabel("Other cause(s):");
+			lblCustomCause.setBounds(24, 310, 275, 14);
+		}
+		return lblCustomCause;
+	}
+	private JTextArea getTxtAreaCustomCause() {
+		if (txtAreaCustomCause == null) {
+			txtAreaCustomCause = new JTextArea();
+		}
+		return txtAreaCustomCause;
+	}
+	private JScrollPane getScrollPane_1() {
+		if (scrollPane_1 == null) {
+			scrollPane_1 = new JScrollPane();
+			scrollPane_1.setBounds(24, 325, 275, 91);
+			scrollPane_1.setViewportView(getTxtAreaCustomCause());
+		}
+		return scrollPane_1;
+	}
+	private JButton getBtnAddCustomCause() {
+		if (btnAddCustomCause == null) {
+			btnAddCustomCause = new JButton("Add");
+			btnAddCustomCause.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					String customCause = getTxtAreaCustomCause().getText();
+					if (!customCause.isBlank() && !finalCauses.contains(customCause))
+						finalCauses.addElement(customCause);
+				}
+			});
+			btnAddCustomCause.setBounds(229, 427, 70, 23);
+			
+		}
+		return btnAddCustomCause;
+	}
+	private JList getFinalCausesList() {
+		if (finalCausesList == null) {
+			finalCausesList = new JList();
+		}
+		return finalCausesList;
+	}
+	private JScrollPane getScrollPane_2() {
+		if (scrollPane_2 == null) {
+			scrollPane_2 = new JScrollPane();
+			scrollPane_2.setBounds(368, 165, 229, 126);
+			scrollPane_2.setViewportView(getFinalCausesList());
+		}
+		return scrollPane_2;
+	}
+	private JLabel getLblSelectedCauses() {
+		if (lblSelectedCauses == null) {
+			lblSelectedCauses = new JLabel("Selected cause(s):");
+			lblSelectedCauses.setBounds(368, 137, 161, 14);
+		}
+		return lblSelectedCauses;
+	}
+	private JButton getBtnRemoveCause() {
+		if (btnRemoveCause == null) {
+			btnRemoveCause = new JButton("<<");
+			btnRemoveCause.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					// Get selected items from jList3
+	                List<String> selectedItems = getFinalCausesList().getSelectedValuesList();
+	                for (String item : selectedItems) {
+	                    finalCauses.removeElement(item);
+	                }
+				}
+			});
+			btnRemoveCause.setBounds(263, 221, 77, 23);
+		}
+		return btnRemoveCause;
 	}
 }
