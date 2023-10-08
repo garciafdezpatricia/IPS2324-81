@@ -10,9 +10,8 @@ import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
-import java.util.*;
 
 import javax.mail.Authenticator;
 import javax.mail.Message;
@@ -36,6 +35,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import db.Doctor;
+import db.Patient;
 import util.ConnectionFactory;
 
 public class MedicalRecepcionistView extends JFrame {
@@ -63,8 +63,8 @@ public class MedicalRecepcionistView extends JFrame {
 	private JTextField textFieldSSNumber;
 	private DefaultListModel<Doctor> doctors = new DefaultListModel<>();
 	private DefaultListModel<Doctor> doctorsReset = new DefaultListModel<>();
-
-
+	private DefaultListModel<Patient> patients = new DefaultListModel<>();
+	private DefaultListModel<Patient> patientsReset = new DefaultListModel<>();
 
 	/**
 	 * Launch the application.
@@ -101,9 +101,13 @@ public class MedicalRecepcionistView extends JFrame {
 	private JTextField textField_2;
 	private JButton btnFilterName;
 	private JButton btnRegNumber;
-	private JPanel panel;
+	private JPanel panelSurDoctor;
 	private JRadioButton rdbtnUrgent;
 	private JButton btnReset;
+	private JButton btnFilterPatientName;
+	private JButton btnFilterSS;
+	private JPanel panelPatientsReset;
+	private JButton btnResetPatients;
 
 	/**
 	 * Create the frame.
@@ -115,10 +119,14 @@ public class MedicalRecepcionistView extends JFrame {
 
 			// Crear una sentencia SQL
 			Statement statement = connection.createStatement();
+			Statement statement_patient = connection.createStatement();
 
 			// Ejecutar una consulta SQL
 			String sql = "SELECT * FROM DOCTOR";
 			ResultSet resultSet = statement.executeQuery(sql);
+
+			String sql_patients = "SELECT * FROM PATIENT";
+			ResultSet resultSet_patients = statement_patient.executeQuery(sql_patients);
 
 			// Procesar los resultados
 			while (resultSet.next()) {
@@ -131,6 +139,19 @@ public class MedicalRecepcionistView extends JFrame {
 				System.out.println("ID: " + id + ", Numero Colegiado: " + numcolegiado);
 				doctors.addElement(new Doctor(id, numcolegiado, name, surname, email));
 				doctorsReset.addElement(new Doctor(id, numcolegiado, name, surname, email));
+
+			}
+
+			// Procesar los resultados
+			while (resultSet_patients.next()) {
+				int id = resultSet_patients.getInt("id");
+				String contactinfo = resultSet_patients.getString("contactinfo");
+				String name = resultSet_patients.getString("firstname");
+				String surname = resultSet_patients.getString("surname");
+				String dni = resultSet_patients.getString("dni");
+
+				patients.addElement(new Patient(id, name, surname, dni, contactinfo));
+				patientsReset.addElement(new Patient(id, name, surname, dni, contactinfo));
 
 			}
 
@@ -152,12 +173,11 @@ public class MedicalRecepcionistView extends JFrame {
 		contentPane.add(getPanelGeneral(), BorderLayout.CENTER);
 		contentPane.add(getPanel_buttons(), BorderLayout.SOUTH);
 
+		// doctors
+		panel_doctor.add(scrollPaneDoctor, BorderLayout.CENTER);
 
-		listDoctor = new JList<>(doctors); // Asegúrate de especificar el tipo de elemento en la JList
-		scrollPaneDoctor = new JScrollPane(listDoctor);
-
-		// Agregar el JScrollPane con la JList al contenido del JFrame
-		panel_doctor.add(scrollPaneDoctor, BorderLayout.CENTER); // Puedes ajustar la ubicación según tus necesidades
+		// patient
+		panel_patient.add(scrollPane_patients, BorderLayout.CENTER);
 
 	}
 
@@ -197,7 +217,7 @@ public class MedicalRecepcionistView extends JFrame {
 			panel_doctor.setLayout(new BorderLayout(0, 0));
 			panel_doctor.add(getPanel_5(), BorderLayout.NORTH);
 			panel_doctor.add(getScrollPaneDoctor(), BorderLayout.CENTER);
-			panel_doctor.add(getPanel(), BorderLayout.SOUTH);
+			panel_doctor.add(getPanelSurDoctor(), BorderLayout.SOUTH);
 		}
 		return panel_doctor;
 	}
@@ -210,6 +230,7 @@ public class MedicalRecepcionistView extends JFrame {
 			panel_patient.setLayout(new BorderLayout(0, 0));
 			panel_patient.add(getPanel_patient_filter(), BorderLayout.NORTH);
 			panel_patient.add(getScrollPane_patients(), BorderLayout.CENTER);
+			panel_patient.add(getPanelPatientsReset(), BorderLayout.SOUTH);
 		}
 		return panel_patient;
 	}
@@ -251,7 +272,8 @@ public class MedicalRecepcionistView extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					int opcion = JOptionPane.showConfirmDialog(MedicalRecepcionistView.this,
 							"Are you sure you want to reserve the appointment between the doctor(s) "
-									+ listDoctor.getSelectedValuesList() + " and the patient xxxx on mm/dd/yy at hh/mm in the office xxxx?",
+									+ listDoctor.getSelectedValuesList() + " and the patient "
+									+ list_patients.getSelectedValue() + " on mm/dd/yy at hh/mm in the office xxxx?",
 							"Confirmation", JOptionPane.YES_NO_OPTION);
 
 					// Verificar la respuesta del usuario
@@ -261,8 +283,8 @@ public class MedicalRecepcionistView extends JFrame {
 						System.out.println("Acción realizada.");
 						// TODO: se envia un correo
 						if (rdbtnUrgent.isSelected()) {
-							for(int i = 0; i < listDoctor.getSelectedValuesList().size(); i++) {
-								sendEmail(((Doctor)listDoctor.getSelectedValuesList().get(i)).getEmail());
+							for (int i = 0; i < listDoctor.getSelectedValuesList().size(); i++) {
+								sendEmail(((Doctor) listDoctor.getSelectedValuesList().get(i)).getEmail());
 							}
 						}
 					} else {
@@ -276,11 +298,10 @@ public class MedicalRecepcionistView extends JFrame {
 		return btnFinish;
 	}
 
-	//TODO: poner más datos
+	// TODO: poner más datos
 	private void sendEmail(String destinatario) {
-//		String destinatario = "lauratbg2001@gmail.com";
 		String asunto = "Urgent appointment";
-		String mensaje = "You have a new urgent appointment with the patient xxxx";
+		String mensaje = "You have a new urgent appointment with the patient " + list_patients.getSelectedValue();
 
 		// Configurar propiedades para la conexión SMTP
 		Properties propiedades = new Properties();
@@ -325,11 +346,15 @@ public class MedicalRecepcionistView extends JFrame {
 	private JPanel getPanel_patient_filter() {
 		if (panel_patient_filter == null) {
 			panel_patient_filter = new JPanel();
-			panel_patient_filter.setLayout(new GridLayout(0, 2, 0, 0));
+			panel_patient_filter
+					.setBorder(new TitledBorder(null, "Filters", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+			panel_patient_filter.setLayout(new GridLayout(0, 3, 0, 0));
 			panel_patient_filter.add(getLblIPatientNam());
 			panel_patient_filter.add(getTextFieldNamePatient());
+			panel_patient_filter.add(getBtnFilterPatientName());
 			panel_patient_filter.add(getLblSSNumber());
 			panel_patient_filter.add(getTextFieldSSNumber());
+			panel_patient_filter.add(getBtnFilterSS());
 		}
 		return panel_patient_filter;
 	}
@@ -352,7 +377,8 @@ public class MedicalRecepcionistView extends JFrame {
 
 	private JScrollPane getScrollPane_patients() {
 		if (scrollPane_patients == null) {
-			scrollPane_patients = new JScrollPane();
+
+			scrollPane_patients = new JScrollPane(list_patients);
 			scrollPane_patients.setViewportView(getList_patients());
 		}
 		return scrollPane_patients;
@@ -360,7 +386,7 @@ public class MedicalRecepcionistView extends JFrame {
 
 	private JList getList_patients() {
 		if (list_patients == null) {
-			list_patients = new JList();
+			list_patients = new JList<>(patients); // Asegúrate de especificar el tipo de elemento en la JList
 			list_patients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		}
 		return list_patients;
@@ -368,7 +394,7 @@ public class MedicalRecepcionistView extends JFrame {
 
 	private JScrollPane getScrollPaneDoctor() {
 		if (scrollPaneDoctor == null) {
-			scrollPaneDoctor = new JScrollPane();
+			scrollPaneDoctor = new JScrollPane(listDoctor);
 			scrollPaneDoctor.setViewportView(getListDoctor());
 		}
 		return scrollPaneDoctor;
@@ -376,7 +402,7 @@ public class MedicalRecepcionistView extends JFrame {
 
 	private JList getListDoctor() {
 		if (listDoctor == null) {
-			listDoctor = new JList();
+			listDoctor = new JList<>(doctors);
 		}
 		return listDoctor;
 	}
@@ -441,7 +467,7 @@ public class MedicalRecepcionistView extends JFrame {
 		if (textRegNumber == null) {
 			textRegNumber = new JTextField();
 			textRegNumber.setColumns(10);
-			
+
 		}
 		return textRegNumber;
 	}
@@ -512,30 +538,32 @@ public class MedicalRecepcionistView extends JFrame {
 		}
 		return textField_2;
 	}
+
 	private JButton getBtnFilterName() {
 		if (btnFilterName == null) {
 			btnFilterName = new JButton("Filter");
 			DefaultListModel<Doctor> filteredByName = new DefaultListModel<>();
 			btnFilterName.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					if(!getTextNameDoctor().getText().isBlank() && !getTextNameDoctor().getText().isEmpty()) {
-						for(int i = 0; i < doctors.getSize(); i++) {
-							if(getTextNameDoctor().getText().equals(doctors.get(i).getName())) {
+					if (!getTextNameDoctor().getText().isBlank() && !getTextNameDoctor().getText().isEmpty()) {
+						for (int i = 0; i < doctors.getSize(); i++) {
+							if (getTextNameDoctor().getText().toLowerCase()
+									.equals(doctors.get(i).getName().toLowerCase())) {
 								filteredByName.addElement(doctors.get(i));
 							}
 						}
 					}
-					
-					List<Doctor>selected = listDoctor.getSelectedValuesList();
-		
+
+					List<Doctor> selected = listDoctor.getSelectedValuesList();
+
 					doctors.removeAllElements();
 					listDoctor.getSelectedValue();
-					for(int i = 0; i < filteredByName.size(); i++) {
-						if(!doctors.contains(filteredByName.get(i))) {
+					for (int i = 0; i < filteredByName.size(); i++) {
+						if (!doctors.contains(filteredByName.get(i))) {
 							doctors.addElement(filteredByName.get(i));
 						}
 					}
-					for(int i = 0; i < selected.size(); i++) {
+					for (int i = 0; i < selected.size(); i++) {
 						doctors.addElement(selected.get(i));
 					}
 				}
@@ -543,31 +571,32 @@ public class MedicalRecepcionistView extends JFrame {
 		}
 		return btnFilterName;
 	}
+
 	private JButton getBtnRegNumber() {
 		if (btnRegNumber == null) {
 			btnRegNumber = new JButton("Filter");
-			
+
 			DefaultListModel<Doctor> filteredByRegNumber = new DefaultListModel<>();
 			btnRegNumber.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					if(!getTextRegNumber().getText().isBlank() && !getTextRegNumber().getText().isEmpty()) {
-						for(int i = 0; i < doctors.getSize(); i++) {
-							if(getTextRegNumber().getText().equals(doctors.get(i).getNumColegiado())) {
+					if (!getTextRegNumber().getText().isBlank() && !getTextRegNumber().getText().isEmpty()) {
+						for (int i = 0; i < doctors.getSize(); i++) {
+							if (getTextRegNumber().getText().equals(doctors.get(i).getNumColegiado())) {
 								filteredByRegNumber.addElement(doctors.get(i));
 							}
 						}
 					}
-					
-					List<Doctor>selected = listDoctor.getSelectedValuesList();
-		
+
+					List<Doctor> selected = listDoctor.getSelectedValuesList();
+
 					doctors.removeAllElements();
 					listDoctor.getSelectedValue();
-					for(int i = 0; i < filteredByRegNumber.size(); i++) {
-						if(!doctors.contains(filteredByRegNumber.get(i))) {
+					for (int i = 0; i < filteredByRegNumber.size(); i++) {
+						if (!doctors.contains(filteredByRegNumber.get(i))) {
 							doctors.addElement(filteredByRegNumber.get(i));
 						}
 					}
-					for(int i = 0; i < selected.size(); i++) {
+					for (int i = 0; i < selected.size(); i++) {
 						doctors.addElement(selected.get(i));
 					}
 				}
@@ -575,33 +604,105 @@ public class MedicalRecepcionistView extends JFrame {
 		}
 		return btnRegNumber;
 	}
-	private JPanel getPanel() {
-		if (panel == null) {
-			panel = new JPanel();
-			panel.setLayout(new GridLayout(0, 2, 0, 0));
-			panel.add(getRdbtnUrgent());
-			panel.add(getBtnReset());
+
+	private JPanel getPanelSurDoctor() {
+		if (panelSurDoctor == null) {
+			panelSurDoctor = new JPanel();
+			panelSurDoctor.setLayout(new GridLayout(0, 2, 0, 0));
+			panelSurDoctor.add(getRdbtnUrgent());
+			panelSurDoctor.add(getBtnReset());
 		}
-		return panel;
+		return panelSurDoctor;
 	}
+
 	private JRadioButton getRdbtnUrgent() {
 		if (rdbtnUrgent == null) {
 			rdbtnUrgent = new JRadioButton("Urgent");
 		}
 		return rdbtnUrgent;
 	}
+
 	private JButton getBtnReset() {
 		if (btnReset == null) {
-			btnReset = new JButton("ResetFilters");
+			btnReset = new JButton("Reset Filters");
 			btnReset.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					doctors.removeAllElements();
-					for(int i = 0; i < doctorsReset.size(); i++) {
+					for (int i = 0; i < doctorsReset.size(); i++) {
 						doctors.addElement(doctorsReset.get(i));
 					}
+					textNameDoctor.setText("");
+					textRegNumber.setText("");
 				}
 			});
 		}
 		return btnReset;
+	}
+
+	private JButton getBtnFilterPatientName() {
+		if (btnFilterPatientName == null) {
+			btnFilterPatientName = new JButton("Filter");
+			DefaultListModel<Patient> filteredByName = new DefaultListModel<>();
+			btnFilterPatientName.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					if (!getTextFieldNamePatient().getText().isBlank()
+							&& !getTextFieldNamePatient().getText().isEmpty()) {
+						for (int i = 0; i < patients.getSize(); i++) {
+							if (getTextFieldNamePatient().getText().toLowerCase()
+									.equals(patients.get(i).getFirstName().toLowerCase())) {
+								filteredByName.addElement(patients.get(i));
+							}
+						}
+					}
+
+					List<Patient> selected = list_patients.getSelectedValuesList();
+
+					patients.removeAllElements();
+					list_patients.getSelectedValue();
+					for (int i = 0; i < filteredByName.size(); i++) {
+						if (!patients.contains(filteredByName.get(i))) {
+							patients.addElement(filteredByName.get(i));
+						}
+					}
+					for (int i = 0; i < selected.size(); i++) {
+						patients.addElement(selected.get(i));
+					}
+				}
+			});
+		}
+		return btnFilterPatientName;
+	}
+
+	private JButton getBtnFilterSS() {
+		if (btnFilterSS == null) {
+			btnFilterSS = new JButton("Filter");
+		}
+		return btnFilterSS;
+	}
+
+	private JPanel getPanelPatientsReset() {
+		if (panelPatientsReset == null) {
+			panelPatientsReset = new JPanel();
+			panelPatientsReset.setLayout(new GridLayout(0, 1, 0, 0));
+			panelPatientsReset.add(getBtnResetPatients());
+		}
+		return panelPatientsReset;
+	}
+
+	private JButton getBtnResetPatients() {
+		if (btnResetPatients == null) {
+			btnResetPatients = new JButton("Reset filters");
+			btnResetPatients.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					patients.removeAllElements();
+					for (int i = 0; i < patientsReset.size(); i++) {
+						patients.addElement(patientsReset.get(i));
+					}
+					textFieldNamePatient.setText("");
+					textFieldSSNumber.setText("");
+				}
+			});
+		}
+		return btnResetPatients;
 	}
 }
