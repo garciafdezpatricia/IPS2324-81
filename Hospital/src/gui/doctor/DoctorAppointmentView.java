@@ -5,6 +5,9 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import logic.creator.CausesCreator;
+
 import java.awt.BorderLayout;
 import javax.swing.JLabel;
 import java.awt.FlowLayout;
@@ -17,6 +20,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.awt.event.ActionEvent;
 import javax.swing.JToggleButton;
 import javax.swing.JRadioButton;
@@ -66,11 +70,11 @@ public class DoctorAppointmentView extends JFrame {
 	private JLabel lblSelectedCauses;
 	private JButton btnRemoveCause;
 
-	
-	private List<String> causes = new ArrayList<String>(Arrays.asList("Rodilla rota", "Dolor de cabeza", "Embarazo", 
-			"Revisión médica", "Análisis de sangre", "Vacunación", "Distensión de ligamento anterior cruzado", "Tendinitis"));
-	
+	private CausesCreator causesCreator;
+	private Map<String, List<String>> causes;
+
 	private DefaultListModel<String> finalCauses = new DefaultListModel<String>();
+
 	/**
 	 * Launch the application.
 	 */
@@ -101,8 +105,6 @@ public class DoctorAppointmentView extends JFrame {
 		contentPane.add(getAppointmentInfoPanel(), BorderLayout.NORTH);
 		contentPane.add(getAppointmentOptionsPanel(), BorderLayout.CENTER);
 		contentPane.add(getButtonsPanel(), BorderLayout.SOUTH);
-		
-		
 	}
 
 	private JPanel getAppointmentInfoPanel() {
@@ -116,6 +118,7 @@ public class DoctorAppointmentView extends JFrame {
 		}
 		return appointmentInfoPanel;
 	}
+
 	private JLabel getLblAppointmentPatient() {
 		if (lblAppointmentPatient == null) {
 			lblAppointmentPatient = new JLabel("New label");
@@ -124,6 +127,7 @@ public class DoctorAppointmentView extends JFrame {
 		}
 		return lblAppointmentPatient;
 	}
+
 	private JLabel getLblAppointmentDate() {
 		if (lblAppointmentDate == null) {
 			lblAppointmentDate = new JLabel("New label");
@@ -132,6 +136,7 @@ public class DoctorAppointmentView extends JFrame {
 		}
 		return lblAppointmentDate;
 	}
+
 	private JPanel getAppointmentOptionsPanel() {
 		if (appointmentOptionsPanel == null) {
 			appointmentOptionsPanel = new JPanel();
@@ -158,6 +163,7 @@ public class DoctorAppointmentView extends JFrame {
 		}
 		return appointmentOptionsPanel;
 	}
+
 	private JLabel getLblCheckInTime() {
 		if (lblCheckInTime == null) {
 			lblCheckInTime = new JLabel("Check-in:");
@@ -165,6 +171,7 @@ public class DoctorAppointmentView extends JFrame {
 		}
 		return lblCheckInTime;
 	}
+
 	private JTextField getTxtCheckInTime() {
 		if (txtCheckInTime == null) {
 			txtCheckInTime = new JTextField();
@@ -173,6 +180,7 @@ public class DoctorAppointmentView extends JFrame {
 		}
 		return txtCheckInTime;
 	}
+
 	private JLabel getLblCheckOutTime() {
 		if (lblCheckOutTime == null) {
 			lblCheckOutTime = new JLabel("Check-out:");
@@ -180,6 +188,7 @@ public class DoctorAppointmentView extends JFrame {
 		}
 		return lblCheckOutTime;
 	}
+
 	private JTextField getTxtCheckOutTime() {
 		if (txtCheckOutTime == null) {
 			txtCheckOutTime = new JTextField();
@@ -188,6 +197,7 @@ public class DoctorAppointmentView extends JFrame {
 		}
 		return txtCheckOutTime;
 	}
+
 	private JButton getBtnCheckInTime() {
 		if (btnCheckInTime == null) {
 			btnCheckInTime = new JButton("Auto-fill");
@@ -195,15 +205,16 @@ public class DoctorAppointmentView extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					Date currentDate = new Date();
 					SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
-                    String currentTime = dateFormat.format(currentDate);
-                    // Update the text field with the current time
-                    getTxtCheckInTime().setText(currentTime);
+					String currentTime = dateFormat.format(currentDate);
+					// Update the text field with the current time
+					getTxtCheckInTime().setText(currentTime);
 				}
 			});
 			btnCheckInTime.setBounds(151, 73, 89, 23);
 		}
 		return btnCheckInTime;
 	}
+
 	private JButton getBtnCheckOutTime() {
 		if (btnCheckOutTime == null) {
 			btnCheckOutTime = new JButton("Auto-fill");
@@ -211,15 +222,16 @@ public class DoctorAppointmentView extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					Date currentDate = new Date();
 					SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
-                    String currentTime = dateFormat.format(currentDate);
-                    // Update the text field with the current time
-                    getTxtCheckOutTime().setText(currentTime);
+					String currentTime = dateFormat.format(currentDate);
+					// Update the text field with the current time
+					getTxtCheckOutTime().setText(currentTime);
 				}
 			});
 			btnCheckOutTime.setBounds(467, 73, 89, 23);
 		}
 		return btnCheckOutTime;
 	}
+
 	private JPanel getButtonsPanel() {
 		if (buttonsPanel == null) {
 			buttonsPanel = new JPanel();
@@ -230,18 +242,21 @@ public class DoctorAppointmentView extends JFrame {
 		}
 		return buttonsPanel;
 	}
+
 	private JButton getBtnExit() {
 		if (btnExit == null) {
 			btnExit = new JButton("Exit");
 		}
 		return btnExit;
 	}
+
 	private JButton getBtnSave() {
 		if (btnSave == null) {
 			btnSave = new JButton("Save");
 		}
 		return btnSave;
 	}
+
 	private JLabel getLblAttendance() {
 		if (lblAttendance == null) {
 			lblAttendance = new JLabel("Did the patient attend the appointment?");
@@ -249,45 +264,48 @@ public class DoctorAppointmentView extends JFrame {
 		}
 		return lblAttendance;
 	}
+
 	private JRadioButton getRdbtnYes() {
 		if (rdbtnYes == null) {
 			rdbtnYes = new JRadioButton("Yes");
 			rdbtnYes.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-                    getTxtCheckInTime().setEnabled(true);
-                    getTxtCheckOutTime().setEnabled(true);
-                    getBtnCheckOutTime().setEnabled(true);
-                    getBtnCheckInTime().setEnabled(true);
-                    String value = rdbtnYes.isSelected() ? "Yes" : "No";
-                    getLblValueButtonGroup().setText(value);
+					getTxtCheckInTime().setEnabled(true);
+					getTxtCheckOutTime().setEnabled(true);
+					getBtnCheckOutTime().setEnabled(true);
+					getBtnCheckInTime().setEnabled(true);
+					String value = rdbtnYes.isSelected() ? "Yes" : "No";
+					getLblValueButtonGroup().setText(value);
 				}
 			});
 			rdbtnYes.setSelected(true);
-			buttonGroup.add(rdbtnYes);;
+			buttonGroup.add(rdbtnYes);
+			;
 			rdbtnYes.setBounds(303, 18, 59, 23);
 		}
 		return rdbtnYes;
 	}
+
 	private JRadioButton getRdbtnNo() {
 		if (rdbtnNo == null) {
 			rdbtnNo = new JRadioButton("No");
 			rdbtnNo.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					getTxtCheckInTime().setEnabled(false);
-                	getTxtCheckOutTime().setEnabled(false);
-                    getBtnCheckOutTime().setEnabled(false);
-                    getBtnCheckInTime().setEnabled(false);
-                    String value = rdbtnNo.isSelected() ? "No" : "Yes";
-                    getLblValueButtonGroup().setText(value);
+					getTxtCheckOutTime().setEnabled(false);
+					getBtnCheckOutTime().setEnabled(false);
+					getBtnCheckInTime().setEnabled(false);
+					String value = rdbtnNo.isSelected() ? "No" : "Yes";
+					getLblValueButtonGroup().setText(value);
 				}
 			});
-			
-			
+
 			buttonGroup.add(rdbtnNo);
 			rdbtnNo.setBounds(372, 18, 59, 23);
 		}
 		return rdbtnNo;
 	}
+
 	private JLabel getLblValueButtonGroup() {
 		if (lblValueButtonGroup == null) {
 			lblValueButtonGroup = new JLabel("");
@@ -295,16 +313,22 @@ public class DoctorAppointmentView extends JFrame {
 		}
 		return lblValueButtonGroup;
 	}
+
 	private JList getCausesList() {
 		DefaultListModel<String> model = new DefaultListModel();
-		for (String cause : this.causes) {
-			model.addElement(cause);
-		}
+		this.causesCreator = new CausesCreator();
+		this.causes = causesCreator.getListsOfCauses();
+
+		for (List<String> list : this.causes.values())
+			for (String item : list) {
+				model.addElement(item);
+			}
 		if (causesList == null) {
 			causesList = new JList<>(model);
 		}
 		return causesList;
 	}
+
 	private JScrollPane getScrollPane() {
 		if (scrollPane == null) {
 			scrollPane = new JScrollPane();
@@ -313,6 +337,7 @@ public class DoctorAppointmentView extends JFrame {
 		}
 		return scrollPane;
 	}
+
 	private JLabel getLblListCauses() {
 		if (lblListCauses == null) {
 			lblListCauses = new JLabel("Select appointment cause(s):");
@@ -320,6 +345,7 @@ public class DoctorAppointmentView extends JFrame {
 		}
 		return lblListCauses;
 	}
+
 	private JButton getBtnAddCause() {
 		if (btnAddCause == null) {
 			btnAddCause = new JButton(">>");
@@ -338,6 +364,7 @@ public class DoctorAppointmentView extends JFrame {
 		}
 		return btnAddCause;
 	}
+
 	private JLabel getLblCustomCause() {
 		if (lblCustomCause == null) {
 			lblCustomCause = new JLabel("Other cause(s):");
@@ -345,12 +372,14 @@ public class DoctorAppointmentView extends JFrame {
 		}
 		return lblCustomCause;
 	}
+
 	private JTextArea getTxtAreaCustomCause() {
 		if (txtAreaCustomCause == null) {
 			txtAreaCustomCause = new JTextArea();
 		}
 		return txtAreaCustomCause;
 	}
+
 	private JScrollPane getScrollPane_1() {
 		if (scrollPane_1 == null) {
 			scrollPane_1 = new JScrollPane();
@@ -359,6 +388,7 @@ public class DoctorAppointmentView extends JFrame {
 		}
 		return scrollPane_1;
 	}
+
 	private JButton getBtnAddCustomCause() {
 		if (btnAddCustomCause == null) {
 			btnAddCustomCause = new JButton("Add");
@@ -370,16 +400,18 @@ public class DoctorAppointmentView extends JFrame {
 				}
 			});
 			btnAddCustomCause.setBounds(229, 427, 70, 23);
-			
+
 		}
 		return btnAddCustomCause;
 	}
+
 	private JList getFinalCausesList() {
 		if (finalCausesList == null) {
 			finalCausesList = new JList();
 		}
 		return finalCausesList;
 	}
+
 	private JScrollPane getScrollPane_2() {
 		if (scrollPane_2 == null) {
 			scrollPane_2 = new JScrollPane();
@@ -388,6 +420,7 @@ public class DoctorAppointmentView extends JFrame {
 		}
 		return scrollPane_2;
 	}
+
 	private JLabel getLblSelectedCauses() {
 		if (lblSelectedCauses == null) {
 			lblSelectedCauses = new JLabel("Selected cause(s):");
@@ -395,16 +428,17 @@ public class DoctorAppointmentView extends JFrame {
 		}
 		return lblSelectedCauses;
 	}
+
 	private JButton getBtnRemoveCause() {
 		if (btnRemoveCause == null) {
 			btnRemoveCause = new JButton("<<");
 			btnRemoveCause.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					// Get selected items from jList3
-	                List<String> selectedItems = getFinalCausesList().getSelectedValuesList();
-	                for (String item : selectedItems) {
-	                    finalCauses.removeElement(item);
-	                }
+					List<String> selectedItems = getFinalCausesList().getSelectedValuesList();
+					for (String item : selectedItems) {
+						finalCauses.removeElement(item);
+					}
 				}
 			});
 			btnRemoveCause.setBounds(263, 221, 77, 23);
