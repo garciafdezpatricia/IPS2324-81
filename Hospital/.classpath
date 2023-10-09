@@ -1,21 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+<<<<<<< HEAD
 	<classpathentry kind="src" output="target/classes" path="src">
 		<attributes>
 			<attribute name="optional" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+=======
+	<classpathentry kind="src" path="src"/>
+>>>>>>> branch 'main' of https://github.com/garciafdezpatricia/IPS2324-81
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17">
 		<attributes>
 			<attribute name="module" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
+<<<<<<< HEAD
+=======
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/UO282276/Documents/Repositorios/IPS2324-81/Hospital/lib/ojdbc8.jar">
+		<attributes>
+			<attribute name="module" value="true"/>
+>>>>>>> branch 'main' of https://github.com/garciafdezpatricia/IPS2324-81
+		</attributes>
+	</classpathentry>
+<<<<<<< HEAD
 	<classpathentry kind="lib" path="C:/Users/patri/Downloads/ojdbc8.jar"/>
 	<classpathentry kind="lib" path="C:/Users/patri/Downloads/oraclepki.jar"/>
 	<classpathentry kind="lib" path="C:/Users/patri/Downloads/osdt_core.jar"/>
 	<classpathentry kind="lib" path="C:/Users/patri/Downloads/osdt_cert.jar"/>
 	<classpathentry kind="lib" path="C:/Users/patri/Downloads/ucp.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
+=======
+	<classpathentry kind="lib" path="C:/Users/Laura/Downloads/javax.mail.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Laura/Downloads/jar_files/javax.activation-1.2.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Laura/Downloads/ojdbc8.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Laura/Downloads/oraclepki.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Laura/Downloads/osdt_cert.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Laura/Downloads/osdt_core.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Laura/Downloads/ucp.jar"/>
+	<classpathentry kind="output" path="bin"/>
+>>>>>>> branch 'main' of https://github.com/garciafdezpatricia/IPS2324-81
 </classpath>
