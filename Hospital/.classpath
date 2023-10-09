@@ -8,5 +8,10 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="C:/Users/Laura/Downloads/javax.mail.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Laura/Downloads/jar_files/javax.activation-1.2.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Laura/Downloads/ojdbc8.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Laura/Downloads/oraclepki.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Laura/Downloads/osdt_cert.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Laura/Downloads/osdt_core.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Laura/Downloads/ucp.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
