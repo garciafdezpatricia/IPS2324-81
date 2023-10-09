@@ -6,13 +6,16 @@ public class Patient {
 	private String surName;
 	private String dni;
 	private String contactInfo;
-	public Patient(int id, String firstName, String surName, String dni, String contactInfo) {
+	private int ssnumber;
+	
+	public Patient(int id, String firstName, String surName, String dni, String contactInfo, int ssnumber) {
 		super();
 		this.id = id;
 		this.firstName = firstName;
 		this.surName = surName;
 		this.dni = dni;
 		this.contactInfo = contactInfo;
+		this.setSsnumber(ssnumber);
 	}
 	public int getId() {
 		return id;
@@ -47,6 +50,12 @@ public class Patient {
 	@Override
 	public String toString() {
 		return firstName + " " + surName;
+	}
+	public int getSsnumber() {
+		return ssnumber;
+	}
+	public void setSsnumber(int ssnumber) {
+		this.ssnumber = ssnumber;
 	}
 
 

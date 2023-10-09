@@ -94,11 +94,11 @@ public class MedicalRecepcionistView extends JFrame {
 	private JTextField textRegNumber;
 	private JPanel panelDate;
 	private JLabel lblDay;
-	private JTextField textField;
+	private JTextField textFieldDay;
 	private JLabel lblFrom;
-	private JTextField textField_1;
+	private JTextField textFieldFrom;
 	private JLabel lblTo;
-	private JTextField textField_2;
+	private JTextField textFieldTo;
 	private JButton btnFilterName;
 	private JButton btnRegNumber;
 	private JPanel panelSurDoctor;
@@ -136,11 +136,14 @@ public class MedicalRecepcionistView extends JFrame {
 				String surname = resultSet.getString("surname");
 				String email = resultSet.getString("email");
 				// Procesa otros campos según la estructura de tu tabla
-				System.out.println("ID: " + id + ", Numero Colegiado: " + numcolegiado);
 				doctors.addElement(new Doctor(id, numcolegiado, name, surname, email));
 				doctorsReset.addElement(new Doctor(id, numcolegiado, name, surname, email));
 
 			}
+
+			// Cerrar la conexión
+			resultSet.close();
+			statement.close();
 
 			// Procesar los resultados
 			while (resultSet_patients.next()) {
@@ -149,15 +152,18 @@ public class MedicalRecepcionistView extends JFrame {
 				String name = resultSet_patients.getString("firstname");
 				String surname = resultSet_patients.getString("surname");
 				String dni = resultSet_patients.getString("dni");
+				int ssnumber = resultSet_patients.getInt("ssnumber");
 
-				patients.addElement(new Patient(id, name, surname, dni, contactinfo));
-				patientsReset.addElement(new Patient(id, name, surname, dni, contactinfo));
+
+				patients.addElement(new Patient(id, name, surname, dni, contactinfo, ssnumber));
+				patientsReset.addElement(new Patient(id, name, surname, dni, contactinfo, ssnumber));
 
 			}
 
 			// Cerrar la conexión
-			resultSet.close();
-			statement.close();
+			resultSet_patients.close();
+			statement_patient.close();
+
 			connection.close();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -273,7 +279,9 @@ public class MedicalRecepcionistView extends JFrame {
 					int opcion = JOptionPane.showConfirmDialog(MedicalRecepcionistView.this,
 							"Are you sure you want to reserve the appointment between the doctor(s) "
 									+ listDoctor.getSelectedValuesList() + " and the patient "
-									+ list_patients.getSelectedValue() + " on mm/dd/yy at hh/mm in the office xxxx?",
+									+ list_patients.getSelectedValue() + " on "
+											+ getTextFieldDay().getText() + " "
+													+ "at " + getTextFieldFrom().getText() + "in the office xxxx?",
 							"Confirmation", JOptionPane.YES_NO_OPTION);
 
 					// Verificar la respuesta del usuario
@@ -281,7 +289,6 @@ public class MedicalRecepcionistView extends JFrame {
 						// El usuario ha confirmado, realiza la acción
 						// Puedes poner aquí el código que quieras ejecutar después de la confirmación
 						System.out.println("Acción realizada.");
-						// TODO: se envia un correo
 						if (rdbtnUrgent.isSelected()) {
 							for (int i = 0; i < listDoctor.getSelectedValuesList().size(); i++) {
 								sendEmail(((Doctor) listDoctor.getSelectedValuesList().get(i)).getEmail());
@@ -361,7 +368,7 @@ public class MedicalRecepcionistView extends JFrame {
 
 	private JLabel getLblIPatientNam() {
 		if (lblIPatientNam == null) {
-			lblIPatientNam = new JLabel("Filter by name:");
+			lblIPatientNam = new JLabel("By name:");
 			lblIPatientNam.setFont(new Font("Tahoma", Font.BOLD, 11));
 		}
 		return lblIPatientNam;
@@ -409,7 +416,7 @@ public class MedicalRecepcionistView extends JFrame {
 
 	private JLabel getLblSSNumber() {
 		if (lblSSNumber == null) {
-			lblSSNumber = new JLabel("Filter by social security number:");
+			lblSSNumber = new JLabel("By social security number:");
 			lblSSNumber.setFont(new Font("Tahoma", Font.BOLD, 11));
 		}
 		return lblSSNumber;
@@ -441,7 +448,7 @@ public class MedicalRecepcionistView extends JFrame {
 
 	private JLabel getLblTypeDoctor_1() {
 		if (lblTypeDoctor == null) {
-			lblTypeDoctor = new JLabel("Filter by name:");
+			lblTypeDoctor = new JLabel("By name:");
 			lblTypeDoctor.setFont(new Font("Tahoma", Font.BOLD, 11));
 		}
 		return lblTypeDoctor;
@@ -457,7 +464,7 @@ public class MedicalRecepcionistView extends JFrame {
 
 	private JLabel getLblRegistrationNumber_1() {
 		if (lblRegistrationNumber == null) {
-			lblRegistrationNumber = new JLabel("Filter by doctor's registration number:");
+			lblRegistrationNumber = new JLabel("By doctor's registration number:");
 			lblRegistrationNumber.setFont(new Font("Tahoma", Font.BOLD, 10));
 		}
 		return lblRegistrationNumber;
@@ -479,11 +486,11 @@ public class MedicalRecepcionistView extends JFrame {
 					new TitledBorder(null, "Day and hour", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 			panelDate.setLayout(new GridLayout(0, 6, 0, 0));
 			panelDate.add(getLblDay());
-			panelDate.add(getTextField());
+			panelDate.add(getTextFieldDay());
 			panelDate.add(getLblFrom());
-			panelDate.add(getTextField_1());
+			panelDate.add(getTextFieldFrom());
 			panelDate.add(getLblTo());
-			panelDate.add(getTextField_2());
+			panelDate.add(getTextFieldTo());
 		}
 		return panelDate;
 	}
@@ -496,13 +503,13 @@ public class MedicalRecepcionistView extends JFrame {
 		return lblDay;
 	}
 
-	private JTextField getTextField() {
-		if (textField == null) {
-			textField = new JTextField();
-			textField.setText("mm/dd/yy");
-			textField.setColumns(10);
+	private JTextField getTextFieldDay() {
+		if (textFieldDay == null) {
+			textFieldDay = new JTextField();
+			textFieldDay.setText("mm/dd/yy");
+			textFieldDay.setColumns(10);
 		}
-		return textField;
+		return textFieldDay;
 	}
 
 	private JLabel getLblFrom() {
@@ -513,13 +520,13 @@ public class MedicalRecepcionistView extends JFrame {
 		return lblFrom;
 	}
 
-	private JTextField getTextField_1() {
-		if (textField_1 == null) {
-			textField_1 = new JTextField();
-			textField_1.setText("hh:mm");
-			textField_1.setColumns(10);
+	private JTextField getTextFieldFrom() {
+		if (textFieldFrom == null) {
+			textFieldFrom = new JTextField();
+			textFieldFrom.setText("hh:mm");
+			textFieldFrom.setColumns(10);
 		}
-		return textField_1;
+		return textFieldFrom;
 	}
 
 	private JLabel getLblTo() {
@@ -530,13 +537,13 @@ public class MedicalRecepcionistView extends JFrame {
 		return lblTo;
 	}
 
-	private JTextField getTextField_2() {
-		if (textField_2 == null) {
-			textField_2 = new JTextField();
-			textField_2.setText("hh:mm");
-			textField_2.setColumns(10);
+	private JTextField getTextFieldTo() {
+		if (textFieldTo == null) {
+			textFieldTo = new JTextField();
+			textFieldTo.setText("hh:mm");
+			textFieldTo.setColumns(10);
 		}
-		return textField_2;
+		return textFieldTo;
 	}
 
 	private JButton getBtnFilterName() {
@@ -655,18 +662,18 @@ public class MedicalRecepcionistView extends JFrame {
 						}
 					}
 
-					List<Patient> selected = list_patients.getSelectedValuesList();
-
+//					List<Patient> selected = list_patients.getSelectedValuesList();
+//
 					patients.removeAllElements();
-					list_patients.getSelectedValue();
+//					list_patients.getSelectedValue();
 					for (int i = 0; i < filteredByName.size(); i++) {
 						if (!patients.contains(filteredByName.get(i))) {
 							patients.addElement(filteredByName.get(i));
 						}
 					}
-					for (int i = 0; i < selected.size(); i++) {
-						patients.addElement(selected.get(i));
-					}
+//					for (int i = 0; i < selected.size(); i++) {
+//						patients.addElement(selected.get(i));
+//					}
 				}
 			});
 		}
@@ -676,6 +683,33 @@ public class MedicalRecepcionistView extends JFrame {
 	private JButton getBtnFilterSS() {
 		if (btnFilterSS == null) {
 			btnFilterSS = new JButton("Filter");
+			DefaultListModel<Patient> filteredBySSNumber = new DefaultListModel<>();
+			btnFilterSS.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					if (!getTextFieldSSNumber().getText().isBlank()
+							&& !getTextFieldSSNumber().getText().isEmpty()) {
+						for (int i = 0; i < patients.getSize(); i++) {
+							if (Integer.valueOf(getTextFieldSSNumber().getText())==
+									patients.get(i).getSsnumber()) {
+								filteredBySSNumber.addElement(patients.get(i));
+							}
+						}
+					}
+
+//					List<Patient> selected = list_patients.getSelectedValuesList();
+//
+					patients.removeAllElements();
+//					list_patients.getSelectedValue();
+					for (int i = 0; i < filteredBySSNumber.size(); i++) {
+						if (!patients.contains(filteredBySSNumber.get(i))) {
+							patients.addElement(filteredBySSNumber.get(i));
+						}
+					}
+//					for (int i = 0; i < selected.size(); i++) {
+//						patients.addElement(selected.get(i));
+//					}
+				}
+			});
 		}
 		return btnFilterSS;
 	}
