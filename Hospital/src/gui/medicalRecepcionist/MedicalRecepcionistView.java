@@ -29,6 +29,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
@@ -37,6 +38,8 @@ import javax.swing.border.TitledBorder;
 import db.Doctor;
 import db.Patient;
 import util.ConnectionFactory;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ListSelectionEvent;
 
 public class MedicalRecepcionistView extends JFrame {
 
@@ -66,6 +69,7 @@ public class MedicalRecepcionistView extends JFrame {
 	private DefaultListModel<Patient> patients = new DefaultListModel<>();
 	private DefaultListModel<Patient> patientsReset = new DefaultListModel<>();
 
+	
 	/**
 	 * Launch the application.
 	 */
@@ -108,6 +112,10 @@ public class MedicalRecepcionistView extends JFrame {
 	private JButton btnFilterSS;
 	private JPanel panelPatientsReset;
 	private JButton btnResetPatients;
+	private JTextArea txtContactInfo;
+	private JPanel panelSouthPatient;
+	private JButton btnEdit;
+	private JButton btnSave;
 
 	/**
 	 * Create the frame.
@@ -153,7 +161,6 @@ public class MedicalRecepcionistView extends JFrame {
 				String surname = resultSet_patients.getString("surname");
 				String dni = resultSet_patients.getString("dni");
 				int ssnumber = resultSet_patients.getInt("ssnumber");
-
 
 				patients.addElement(new Patient(id, name, surname, dni, contactinfo, ssnumber));
 				patientsReset.addElement(new Patient(id, name, surname, dni, contactinfo, ssnumber));
@@ -254,6 +261,8 @@ public class MedicalRecepcionistView extends JFrame {
 			panel_information.setBorder(
 					new TitledBorder(null, "Information", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 			panel_information.setLayout(new BorderLayout(0, 0));
+			panel_information.add(getTxtContactInfo(), BorderLayout.CENTER);
+			panel_information.add(getPanelSouthPatient(), BorderLayout.SOUTH);
 		}
 		return panel_information;
 	}
@@ -279,9 +288,8 @@ public class MedicalRecepcionistView extends JFrame {
 					int opcion = JOptionPane.showConfirmDialog(MedicalRecepcionistView.this,
 							"Are you sure you want to reserve the appointment between the doctor(s) "
 									+ listDoctor.getSelectedValuesList() + " and the patient "
-									+ list_patients.getSelectedValue() + " on "
-											+ getTextFieldDay().getText() + " "
-													+ "at " + getTextFieldFrom().getText() + "in the office xxxx?",
+									+ list_patients.getSelectedValue() + " on " + getTextFieldDay().getText() + " "
+									+ "at " + getTextFieldFrom().getText() + "in the office xxxx?",
 							"Confirmation", JOptionPane.YES_NO_OPTION);
 
 					// Verificar la respuesta del usuario
@@ -394,6 +402,15 @@ public class MedicalRecepcionistView extends JFrame {
 	private JList getList_patients() {
 		if (list_patients == null) {
 			list_patients = new JList<>(patients); // Asegúrate de especificar el tipo de elemento en la JList
+			list_patients.addListSelectionListener(new ListSelectionListener() {
+				public void valueChanged(ListSelectionEvent e) {
+					Patient p = (Patient)getList_patients().getSelectedValue();
+					if (p != null)
+						getTxtContactInfo().setText(p.getContactInfo());
+					else
+						getTxtContactInfo().setText("");
+				}
+			});
 			list_patients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		}
 		return list_patients;
@@ -686,11 +703,9 @@ public class MedicalRecepcionistView extends JFrame {
 			DefaultListModel<Patient> filteredBySSNumber = new DefaultListModel<>();
 			btnFilterSS.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					if (!getTextFieldSSNumber().getText().isBlank()
-							&& !getTextFieldSSNumber().getText().isEmpty()) {
+					if (!getTextFieldSSNumber().getText().isBlank() && !getTextFieldSSNumber().getText().isEmpty()) {
 						for (int i = 0; i < patients.getSize(); i++) {
-							if (Integer.valueOf(getTextFieldSSNumber().getText())==
-									patients.get(i).getSsnumber()) {
+							if (Integer.valueOf(getTextFieldSSNumber().getText()) == patients.get(i).getSsnumber()) {
 								filteredBySSNumber.addElement(patients.get(i));
 							}
 						}
@@ -738,5 +753,44 @@ public class MedicalRecepcionistView extends JFrame {
 			});
 		}
 		return btnResetPatients;
+	}
+
+	private JTextArea getTxtContactInfo() {
+		if (txtContactInfo == null) {
+			txtContactInfo = new JTextArea();
+		}
+		return txtContactInfo;
+	}
+
+	private JPanel getPanelSouthPatient() {
+		if (panelSouthPatient == null) {
+			panelSouthPatient = new JPanel();
+			panelSouthPatient.setLayout(new GridLayout(0, 2, 0, 0));
+			panelSouthPatient.add(getBtnEdit());
+			panelSouthPatient.add(getBtnSave());
+		}
+		return panelSouthPatient;
+	}
+
+	private JButton getBtnEdit() {
+		if (btnEdit == null) {
+			btnEdit = new JButton("Edit");
+			btnEdit.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					getBtnSave().setEnabled(true); // when the edit button is pressed, is assumed that the contact info
+													// of the patient is modified so the save button is enabled
+				}
+			});
+
+		}
+		return btnEdit;
+	}
+
+	private JButton getBtnSave() {
+		if (btnSave == null) {
+			btnSave = new JButton("Save");
+			btnSave.setEnabled(false);
+		}
+		return btnSave;
 	}
 }
